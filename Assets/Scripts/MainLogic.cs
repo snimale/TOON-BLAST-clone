@@ -16,6 +16,8 @@ public class MainLogic : MonoBehaviour
     private const int CreateBomb = 6;
     private const int CreateMissile = 4;
     private const int CorruptBrickCreate = 4;
+    private const float ScoreUpdateAnimationPeriod = 1f;
+    private const int GameTimeLimit = 60; // seconds
     private int _corruptBrickNum = 6;
     private int _move;
 
@@ -39,10 +41,12 @@ public class MainLogic : MonoBehaviour
 
     private bool _crRunning;
     private bool _crScoreUpdationRunning;
-    private float scoreUpdateAnimationPeriod = 1f;
+    private float gameRunTime;
 
     void Start()
     {
+        SetInitialMapSizes();
+        SetInitialSpawnPosition();
         for (int i = 0; i < Grid.Length; i++)
         {
             Grid[i] = new Transform[Height];
@@ -57,7 +61,11 @@ public class MainLogic : MonoBehaviour
         };
         FillContainer();
         _score = 0;
+        gameRunTime = 0;
         _crScoreUpdationRunning = false;
+        
+        // init ui
+        updateTimeUI();
     }
 
     /**
@@ -113,10 +121,45 @@ public class MainLogic : MonoBehaviour
             _changeHappen = false;
         }
 
+        if (!_crRunning) {
+            gameOver |= !checkAvailableTime();
+        }
+
         if (gameOver)
         {
             EndGame();
         }
+
+        int previousDisplayTime = (int) (GameTimeLimit - gameRunTime);
+        gameRunTime += Time.deltaTime;
+
+        if(previousDisplayTime != (int) (GameTimeLimit - gameRunTime) && !gameOver)
+        {
+            updateTimeUI();
+        }
+    }
+
+    /*
+     * Calculates initial position before any block is spwaned.
+     * It is dynamic, giving correct initial position for any size or number of blocks in map
+     */
+    private void SetInitialSpawnPosition()
+    {
+        Vector3 position = Vector3.zero;
+        position.x -=  (Width * BrickWidth) / 2;
+        position.y -= (Height * BrickHeight) / 2;
+        
+        // block corner to centre offset
+        position.x +=  (BrickWidth) / 2;
+        position.y += (BrickHeight) / 2;
+        
+        transform.position = position;
+    }
+
+    private void SetInitialMapSizes()
+    {
+        var boxTransform = GameObject.Find("box").GetComponent<Transform>();
+        boxTransform.localScale = new Vector3(Width * BrickWidth, Height * BrickHeight, 1f);
     }
 
     /**
@@ -286,6 +329,14 @@ public class MainLogic : MonoBehaviour
         return false;
     }
 
+    // checks if game is running over time limit
+    private Boolean checkAvailableTime() {
+        if(gameRunTime < GameTimeLimit)
+            return true;
+        else 
+            return false;
+    }
+
 
     private void FindAndDeleteElements(Transform clickedObject)
     {
@@ -421,12 +472,18 @@ public class MainLogic : MonoBehaviour
         while(scoreToDisplay != _score)
         {
             timeElapsed += Time.deltaTime;
-            scoreToDisplay = (int)Mathf.Lerp(initialScore, _score, scoreAnimationCurve.Evaluate(timeElapsed / scoreUpdateAnimationPeriod));
+            scoreToDisplay = (int)Mathf.Lerp(initialScore, _score, scoreAnimationCurve.Evaluate(timeElapsed / ScoreUpdateAnimationPeriod));
             text.text = scoreToDisplay.ToString();
             yield return new WaitForEndOfFrame();
         }
         text.text = _score.ToString();
         _crScoreUpdationRunning = false;
+    }
+
+    private void updateTimeUI()
+    {
+        Text text = GameObject.Find("time").GetComponent<Text>();
+        text.text = ((int) (GameTimeLimit - gameRunTime)).ToString();
     }
 
     void TraverseNew(List<Point> elementsToBeTraversed, string color, List<Point> elementsToBeDeleted,
