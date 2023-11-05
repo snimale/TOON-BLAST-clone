@@ -7,4 +7,4 @@ Credit : [Berke Soysal](https://github.com/BerkeSoysal)
 - Improvement : Score now changes smoothly using score lerp.
 - Improvement : Game now runs on a time limit basis. Player has to get max score before time runs out/no more moves possible.
 - Bug : Map size was dynamic, but on size change didnt spawn at screen centre, spawned at corner. Fix : Position of spawnner now changes dynamically, making in the map centre of screen no matter how map size change.
-- Bug : Walls size and position was not dynamic with respect to Map size changes. Fix : Position and scaling is not done dynamically based on the size of map on start.
+- Bug : Walls size and position was not dynamic with respect to Map size changes. Fix : Position and scaling is done dynamically based on the size of map on start.
