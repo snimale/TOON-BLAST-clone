@@ -23,6 +23,7 @@ public class MainLogic : MonoBehaviour
     public GameObject[] missiles;
     public GameObject bomb;
     public GameObject corruptedBrick;
+    public AnimationCurve scoreAnimationCurve;
 
     private static readonly Transform[][] Grid = new Transform[Width][];
     private IEnumerator _fallElementsDownCoroutine;
@@ -37,6 +38,8 @@ public class MainLogic : MonoBehaviour
     public GameObject gameOverText;
 
     private bool _crRunning;
+    private bool _crScoreUpdationRunning;
+    private float scoreUpdateAnimationPeriod = 1f;
 
     void Start()
     {
@@ -54,6 +57,7 @@ public class MainLogic : MonoBehaviour
         };
         FillContainer();
         _score = 0;
+        _crScoreUpdationRunning = false;
     }
 
     /**
@@ -403,8 +407,26 @@ public class MainLogic : MonoBehaviour
     {
         var scoreToAdd = (int)Math.Pow(count, 2);
         _score += scoreToAdd;
+        if(!_crScoreUpdationRunning)
+            StartCoroutine(updateScoreAnimate());
+    }
+
+    private IEnumerator updateScoreAnimate()
+    {
+        _crScoreUpdationRunning = true;
         Text text = GameObject.Find("score").GetComponent<Text>();
-        text.text = "" + _score;
+        int.TryParse(text.text, out int initialScore);
+        int scoreToDisplay = initialScore;
+        float timeElapsed = 0f;
+        while(scoreToDisplay != _score)
+        {
+            timeElapsed += Time.deltaTime;
+            scoreToDisplay = (int)Mathf.Lerp(initialScore, _score, scoreAnimationCurve.Evaluate(timeElapsed / scoreUpdateAnimationPeriod));
+            text.text = scoreToDisplay.ToString();
+            yield return new WaitForEndOfFrame();
+        }
+        text.text = _score.ToString();
+        _crScoreUpdationRunning = false;
     }
 
     void TraverseNew(List<Point> elementsToBeTraversed, string color, List<Point> elementsToBeDeleted,
