@@ -8,8 +8,8 @@ using Random = UnityEngine.Random;
 
 public class MainLogic : MonoBehaviour
 {
-    private const int Width = 10; //total number of bricks column-wise
-    private const int Height = 20; //total number of bricks row-wise
+    private const int Width = 8; //total number of bricks column-wise
+    private const int Height = 16; //total number of bricks row-wise
     private const float BrickHeight = 0.5f;
     private const float BrickWidth = 0.5f;
     private const int Undefined = -1;
@@ -160,6 +160,25 @@ public class MainLogic : MonoBehaviour
     {
         var boxTransform = GameObject.Find("box").GetComponent<Transform>();
         boxTransform.localScale = new Vector3(Width * BrickWidth, Height * BrickHeight, 1f);
+
+        float offset = 0.25f;
+        Transform wallTransform;
+        
+        wallTransform = GameObject.Find("left wall").GetComponent<Transform>();
+        wallTransform.position = new Vector3(-(offset + Width  * BrickWidth / 2), 0, 0);
+        wallTransform.localScale = new Vector3(0.5f, (((float) Height) / 2) + 1, 1f);
+
+        wallTransform = GameObject.Find("right wall").GetComponent<Transform>();
+        wallTransform.position = new Vector3((offset + Width  * BrickWidth / 2), 0, 0);
+        wallTransform.localScale = new Vector3(0.5f, (((float) Height) / 2) + 1, 1f);
+
+        wallTransform = GameObject.Find("up wall").GetComponent<Transform>();
+        wallTransform.position = new Vector3(0, (offset + Height  * BrickHeight / 2), 0);
+        wallTransform.localScale = new Vector3((((float) Width) / 2), 0.5f, 1f);
+
+        wallTransform = GameObject.Find("down wall").GetComponent<Transform>();
+        wallTransform.position = new Vector3(0, -(offset + Height  * BrickHeight / 2), 0);
+        wallTransform.localScale = new Vector3((((float) Width) / 2), 0.5f, 1f);
     }
 
     /**
