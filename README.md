@@ -1,6 +1,6 @@
 TOON BLASH is a lazy copy of popular mobile game Toon Blast :smile: . 
 Credit : [Berke Soysal](https://github.com/BerkeSoysal)
-
+### Unity version 2021.3.19f1 (64-bit)
 # Modifications
 - removed main menu, direct gameplay on run. (removed associated scripts to go back and forth from and to main menu)
 - Addition of score and time panel gameobject with time, timeText, score and scoreText. (also includes re-alignment of UI)
